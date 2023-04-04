@@ -4,6 +4,7 @@ import Banner from "@/components/Banner";
 import requests from "@/utils/requests";
 import { Movie } from "@/typings";
 import Row from "@/components/Row";
+import useAuth from "@/hooks/useAuth";
 
 //getting the type (from typings.d.ts file) and giving it to netflixOriginals which is an array of movies
 interface Props {
@@ -28,6 +29,10 @@ const Home = ({
   romanceMovies,
   documentaries,
 }: Props) => {
+  const { logout, loading } = useAuth();
+
+  if (loading) return null
+
   return (
     <div className="relative h-screen bg-gradient-to-b lg:h-[140vh]">
       <Head>
@@ -37,16 +42,16 @@ const Home = ({
 
       <Header />
       <main className="relative pl-4 pb-24 lg:space-y-24 lg:pl-16">
-          <Banner netflixOriginals={netflixOriginals} />
-          <section className="md:space-y-24">
-             <Row title="Trending Now" movies={trendingNow}/>
-             <Row title="Top Rated" movies={topRated}/>
-             <Row title="Action Thrillers" movies={actionMovies}/>
-             <Row title="Comedies" movies={comedyMovies}/>
-             <Row title="Horror Movies" movies={horrorMovies}/>
-             <Row title="Romance Movies" movies={romanceMovies}/>
-             <Row title="Documentaries" movies={documentaries}/>
-          </section>
+        <Banner netflixOriginals={netflixOriginals} />
+        <section className="md:space-y-24">
+          <Row title="Trending Now" movies={trendingNow} />
+          <Row title="Top Rated" movies={topRated} />
+          <Row title="Action Thrillers" movies={actionMovies} />
+          <Row title="Comedies" movies={comedyMovies} />
+          <Row title="Horror Movies" movies={horrorMovies} />
+          <Row title="Romance Movies" movies={romanceMovies} />
+          <Row title="Documentaries" movies={documentaries} />
+        </section>
       </main>
     </div>
   );
