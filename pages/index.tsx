@@ -5,6 +5,9 @@ import requests from "@/utils/requests";
 import { Movie } from "@/typings";
 import Row from "@/components/Row";
 import useAuth from "@/hooks/useAuth";
+import { useRecoilValue } from "recoil";
+import { modalState } from "@/atoms/modalAtom";
+import Modal from "@/components/Modal";
 
 //getting the type (from typings.d.ts file) and giving it to netflixOriginals which is an array of movies
 interface Props {
@@ -29,7 +32,8 @@ const Home = ({
   romanceMovies,
   documentaries,
 }: Props) => {
-  const { logout, loading } = useAuth();
+  const { loading } = useAuth();
+  const showModal = useRecoilValue(modalState)
 
   if (loading) return null
 
@@ -53,6 +57,7 @@ const Home = ({
           <Row title="Documentaries" movies={documentaries} />
         </section>
       </main>
+        {showModal && <Modal/>}
     </div>
   );
 };
