@@ -8,6 +8,7 @@ import useAuth from "@/hooks/useAuth";
 import { useRecoilValue } from "recoil";
 import { modalState } from "@/atoms/modalAtom";
 import Modal from "@/components/Modal";
+import Plans from "@/components/Plans";
 
 //getting the type (from typings.d.ts file) and giving it to netflixOriginals which is an array of movies
 interface Props {
@@ -34,11 +35,14 @@ const Home = ({
 }: Props) => {
   const { loading } = useAuth();
   const showModal = useRecoilValue(modalState)
+  const subscription = false
 
-  if (loading) return null
+  if (loading || subscription === null) return null
+
+  if (!subscription) return <Plans/>
 
   return (
-    <div className="relative h-screen bg-gradient-to-b lg:h-[140vh]">
+    <div className={`relative h-screen bg-gradient-to-b lg:h-[140vh] ${showModal && "!h-screen overflow-hidden"}`}>
       <Head>
         <title>Netflix</title>
         <link rel="icon" href="/favicon.ico" />
