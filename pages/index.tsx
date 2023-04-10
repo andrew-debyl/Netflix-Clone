@@ -6,11 +6,13 @@ import { Movie } from "@/typings";
 import Row from "@/components/Row";
 import useAuth from "@/hooks/useAuth";
 import { useRecoilValue } from "recoil";
-import { modalState } from "@/atoms/modalAtom";
+import { modalState, movieState } from "@/atoms/modalAtom";
 import Modal from "@/components/Modal";
 import Plans from "@/components/Plans";
-import { getProducts } from "@stripe/firestore-stripe-payments";
+import { Product, getProducts } from "@stripe/firestore-stripe-payments";
 import payments from "@/lib/stripe";
+import useSubscription from "@/hooks/useSubscription";
+import useList from "@/hooks/useList";
 
 //getting the type (from typings.d.ts file) and giving it to netflixOriginals which is an array of movies
 interface Props {
@@ -22,6 +24,7 @@ interface Props {
   horrorMovies: Movie[];
   romanceMovies: Movie[];
   documentaries: Movie[];
+  products: Product[];
 }
 
 //passing in the movie array props
@@ -34,17 +37,24 @@ const Home = ({
   horrorMovies,
   romanceMovies,
   documentaries,
+  products
 }: Props) => {
-  const { loading } = useAuth();
-  const showModal = useRecoilValue(modalState)
-  const subscription = false
+  const { loading,user } = useAuth();
+  const showModal = useRecoilValue(modalState);
+  const subscription = useSubscription(user);
+  const movie = useRecoilValue(movieState)
+  const list = useList(user?.uid)
 
-  if (loading || subscription === null) return null
+  if (loading || subscription === null) return null;
 
-  if (!subscription) return <Plans/>
+  if (!subscription) return <Plans products={products}/>;
 
   return (
-    <div className={`relative h-screen bg-gradient-to-b lg:h-[140vh] ${showModal && "!h-screen overflow-hidden"}`}>
+    <div
+      className={`relative h-screen bg-gradient-to-b lg:h-[140vh] ${
+        showModal && "!h-screen overflow-hidden"
+      }`}
+    >
       <Head>
         <title>Netflix</title>
         <link rel="icon" href="/favicon.ico" />
@@ -56,6 +66,7 @@ const Home = ({
         <section className="md:space-y-24">
           <Row title="Trending Now" movies={trendingNow} />
           <Row title="Top Rated" movies={topRated} />
+          {list.length > 0 && <Row title="My List" movies={list}/>}
           <Row title="Action Thrillers" movies={actionMovies} />
           <Row title="Comedies" movies={comedyMovies} />
           <Row title="Horror Movies" movies={horrorMovies} />
@@ -63,7 +74,7 @@ const Home = ({
           <Row title="Documentaries" movies={documentaries} />
         </section>
       </main>
-        {showModal && <Modal/>}
+      {showModal && <Modal />}
     </div>
   );
 };
@@ -76,7 +87,9 @@ export const getServerSideProps = async () => {
     includePrices: true,
     activeOnly: true,
   })
-  
+    .then((res) => res)
+    .catch((error) => console.log(error.message));
+
   const [
     netflixOriginals,
     trendingNow,
@@ -107,6 +120,7 @@ export const getServerSideProps = async () => {
       horrorMovies: horrorMovies.results,
       romanceMovies: romanceMovies.results,
       documentaries: documentaries.results,
+      products,
     },
   };
 };
