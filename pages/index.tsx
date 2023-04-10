@@ -9,6 +9,8 @@ import { useRecoilValue } from "recoil";
 import { modalState } from "@/atoms/modalAtom";
 import Modal from "@/components/Modal";
 import Plans from "@/components/Plans";
+import { getProducts } from "@stripe/firestore-stripe-payments";
+import payments from "@/lib/stripe";
 
 //getting the type (from typings.d.ts file) and giving it to netflixOriginals which is an array of movies
 interface Props {
@@ -70,6 +72,11 @@ export default Home;
 
 //fetching and returning the API data
 export const getServerSideProps = async () => {
+  const products = await getProducts(payments, {
+    includePrices: true,
+    activeOnly: true,
+  })
+  
   const [
     netflixOriginals,
     trendingNow,
